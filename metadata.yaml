@@ -1,0 +1,7 @@
+homepage: "https://help.pinterest.com/en/business/article/google-tag-manager-and-pinterest-tag"
+documentation: "https://help.pinterest.com/en/business/article/google-tag-manager-and-pinterest-tag"
+versions:
+  # Latest version
+- sha: 
+  changeNotes: Initial release for Pinterest web-side tag template.
+  # Older versions
