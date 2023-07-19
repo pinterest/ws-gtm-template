@@ -2,6 +2,8 @@ homepage: "https://help.pinterest.com/en/business/article/google-tag-manager-and
 documentation: "https://help.pinterest.com/en/business/article/google-tag-manager-and-pinterest-tag"
 versions:
   # Latest version
+- sha: 50b2dae74cbe17db80beddf35c1082dc24e95310
+  changeNotes: Add support for privacy regulations CCPA.
+  # Older versions
 - sha: adffd1f2203cad00a3f27cfe30b134baae02b49a
   changeNotes: Initial release for Pinterest web-side tag template.
-  # Older versions
