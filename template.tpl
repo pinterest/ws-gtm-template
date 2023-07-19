@@ -287,6 +287,52 @@ ___TEMPLATE_PARAMETERS___
     ]
   },
   {
+    "type": "CHECKBOX",
+    "name": "setOptOut",
+    "checkboxText": "Opt Out Information",
+    "simpleValueType": true,
+    "help": "If checked, you could set the Opt Out Information for Privacy regulations such as CCPA."
+  },
+  {
+    "help": "'opt_out_type' is the field where we accept opt outs for your users' privacy preference. \u003cbr\u003e\u003cbr\u003e It can handle multiple values with commas separated. Current accepted value is \u003cb\u003eLDP\u003c/b\u003e for Limited Data Processing.",
+    "displayName": "Opt Out Type",
+    "name": "opt_out_type",
+    "type": "TEXT",
+    "enablingConditions": [
+      {
+        "paramName": "setOptOut",
+        "type": "EQUALS",
+        "paramValue": true
+      }
+    ]
+  },
+  {
+    "help": "'st' is the field for sharing a user's \u003cb\u003estate of residency\u003c/b\u003e in connection with use of the LDP flag. Please note that the LDP flag does not currently have any effect for users outside of the State of California. \u003cbr\u003e\u003cbr\u003e The state names we accept are SHA256 hashed, standard USPS state abbreviations with two characters (e.g., 'CA').",
+    "displayName": "State",
+    "name": "st",
+    "type": "TEXT",
+    "enablingConditions": [
+      {
+        "paramName": "setOptOut",
+        "type": "EQUALS",
+        "paramValue": true
+      }
+    ]
+  },
+  {
+    "help": "'country' is the field in which you pass a user’s country of residency in connection with use of the LDP flag. Please note that the LDP flag does not currently have any effect for users outside of the State of California. \u003cbr\u003e\u003cbr\u003e The country names we accept are SHA256 hashed, standard ISO-3166 country codes with two characters (e.g., 'US', 'DE').",
+    "displayName": "Country",
+    "name": "country",
+    "type": "TEXT",
+    "enablingConditions": [
+      {
+        "paramName": "setOptOut",
+        "type": "EQUALS",
+        "paramValue": true
+      }
+    ]
+  },
+  {
     "type": "LABEL",
     "name": "aem_upsell",
     "displayName": "\u003cb\u003eEnable automatic enhanced match? \u003c/b\u003eAutomatic enhanced match can help attribute more conversions to your Pinterest ads and increase audience sizes. Navigate to \u003ca href\u003d\"https://ads.pinterest.com/conversions/tag\"\u003ePinterest Ads Manager\u003c/a\u003e to enable. \u003ca href\u003d\"https://help.pinterest.com/business/article/automatic-enhanced-match\"\u003eLearn more\u003c/a\u003e\u003c/br\u003e"
@@ -329,12 +375,17 @@ if (isFirstLoad) {
   if (data.em) {
     initializationData.em = data.em;
   }
+  // Set opt_out params
+  setOptOutParams(data, initializationData);
   pintrk('load', data.tagId.toString(), initializationData);
   pintrk('page');
-} else if (data.em) {
-  const partnerDataUpdate = {
-    'em': data.em,
-  };
+} else {
+  const partnerDataUpdate = {};
+  if (data.em) {
+    partnerDataUpdate.em = data.em;
+  }
+  // Override opt_out params
+  overrideOptOutParams(data, partnerDataUpdate);
   pintrk('set', partnerDataUpdate);
 }
 
@@ -343,7 +394,36 @@ if (isFirstLoad) {
 // but not include config values
 if (data.eventName === "") {
   const partnerDataUpdate = {};
+  setOptOutParams(data, partnerDataUpdate);
   pintrk('set', partnerDataUpdate);
+}
+
+// Set opt_out params
+function setOptOutParams(data, pdObject) {
+  if (data.setOptOut) {
+    if (data.opt_out_type) {
+      pdObject.opt_out_type = data.opt_out_type;
+    }
+    if (data.st) {
+      pdObject.st = data.st;
+    }
+    if (data.country) {
+      pdObject.country = data.country;
+    }
+  }
+}
+
+// Override opt_out params
+function overrideOptOutParams(data, pdObject) {
+  if (data.setOptOut) {
+    pdObject.opt_out_type = data.opt_out_type ? data.opt_out_type : undefined;
+    pdObject.st = data.st ? data.st : undefined;
+    pdObject.country = data.country ? data.country : undefined;
+  } else {
+    pdObject.opt_out_type = undefined;
+    pdObject.st = undefined;
+    pdObject.country = undefined;
+  }
 }
 
 /**
@@ -598,4 +678,4 @@ Jian Li <jianli@pinterest.com>
 Mirko Rodriguez Mallma <mrodriguezmallma@pinterest.com>
 
 Created on 2/19/2019, 9:22:34 PM
-Updated on 11/14/2022, 3:44:00 PM
+Updated on 07/19/2023, 3:40:00 PM
