@@ -62,6 +62,14 @@ ___TEMPLATE_PARAMETERS___
     "valueHint": "{{email}}"
   },
   {
+    "notSetText": "Not set (required for Enhanced Match)",
+    "help": "Optional, but required for Enhanced Match. An external ID is a unique ID that you use to identify a single user. You can send external IDs alongside your conversions. To protect user privacy, the external ID will be hashed before it\u0027s sent to Pinterest. The external_id parameter will accept both hashed and un-hashed email addresses. We handle detection to ensure security and proper storage. See https://help.pinterest.com/en/business/article/enhanced-match for more information.",
+    "displayName": "External ID",
+    "name": "external_id",
+    "type": "TEXT",
+    "valueHint": "{{external_id}}"
+  },
+  {
     "macrosInSelect": false,
     "selectItems": [
       {
@@ -74,16 +82,36 @@ ___TEMPLATE_PARAMETERS___
         "value": "pagevisit"
       },
       {
-        "displayValue": "Add to Cart",
+        "displayValue": "Add To Cart",
         "value": "addtocart"
+      },
+      {
+        "displayValue": "Add To Wishlist",
+        "value": "addtowishlist"
+      },
+      {
+        "displayValue": "AddPaymentInfo",
+        "value": "addpaymentinfo"
       },
       {
         "displayValue": "Checkout",
         "value": "checkout"
       },
       {
+        "displayValue": "Initiate Checkout",
+        "value": "initiatecheckout"
+      },
+      {
         "displayValue": "Signup",
         "value": "signup"
+      },
+      {
+        "displayValue": "Subscribe",
+        "value": "subscribe"
+      },
+      {
+        "displayValue": "ViewContent",
+        "value": "viewcontent"
       },
       {
         "displayValue": "Watch Video",
@@ -122,6 +150,11 @@ ___TEMPLATE_PARAMETERS___
         "paramName": "eventName",
         "type": "EQUALS",
         "paramValue": "addtocart"
+      },
+      {
+        "paramName": "eventName",
+        "type": "EQUALS",
+        "paramValue": "initiatecheckout"
       }
     ],
     "displayName": "Cart Parameters",
@@ -200,9 +233,33 @@ ___TEMPLATE_PARAMETERS___
         "type": "TEXT"
       },
       {
+        "displayName": "Product Name",
+        "simpleValueType": true,
+        "name": "product_name",
+        "type": "TEXT"
+      },
+      {
         "displayName": "Product Category",
         "simpleValueType": true,
         "name": "product_category",
+        "type": "TEXT"
+      },
+      {
+        "displayName": "Product Price",
+        "simpleValueType": true,
+        "name": "product_price",
+        "type": "TEXT"
+      },
+      {
+        "displayName": "Product Quantity",
+        "simpleValueType": true,
+        "name": "product_quantity",
+        "type": "TEXT"
+      },
+      {
+        "displayName": "Product Brand",
+        "simpleValueType": true,
+        "name": "product_brand",
         "type": "TEXT"
       }
     ]
@@ -320,7 +377,7 @@ ___TEMPLATE_PARAMETERS___
     ]
   },
   {
-    "help": "'country' is the field in which you pass a user’s country of residency in connection with use of the LDP flag. Please note that the LDP flag does not currently have any effect for users outside of the State of California. \u003cbr\u003e\u003cbr\u003e The country names we accept are SHA256 hashed, standard ISO-3166 country codes with two characters (e.g., 'US', 'DE').",
+    "help": "'country' is the field in which you pass a user's country of residency in connection with use of the LDP flag. Please note that the LDP flag does not currently have any effect for users outside of the State of California. \u003cbr\u003e\u003cbr\u003e The country names we accept are SHA256 hashed, standard ISO-3166 country codes with two characters (e.g., 'US', 'DE').",
     "displayName": "Country",
     "name": "country",
     "type": "TEXT",
