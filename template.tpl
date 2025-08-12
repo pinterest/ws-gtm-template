@@ -69,46 +69,94 @@ ___TEMPLATE_PARAMETERS___
         "value": ""
       },
       {
-        "displayValue": "Page Visit",
-        "help": "Track visits to specific pages on your website.",
-        "value": "pagevisit"
+        "displayValue": "Add Payment Info",
+        "value": "addpaymentinfo"
       },
       {
         "displayValue": "Add to Cart",
         "value": "addtocart"
       },
       {
+        "displayValue": "Add to Wishlist",
+        "value": "addtowishlist"
+      },
+      {
         "displayValue": "Checkout",
         "value": "checkout"
       },
       {
-        "displayValue": "Signup",
-        "value": "signup"
+        "displayValue": "Custom (legacy)",
+        "value": "custom"
       },
       {
-        "displayValue": "Watch Video",
-        "value": "watchvideo"
+        "displayValue": "Initiate Checkout",
+        "value": "initiatecheckout"
       },
       {
         "displayValue": "Lead",
         "value": "lead"
       },
       {
+        "displayValue": "Page Visit",
+        "help": "Track visits to specific pages on your website.",
+        "value": "pagevisit"
+      },
+      {
         "displayValue": "Search",
         "value": "search"
+      },
+      {
+        "displayValue": "Signup",
+        "value": "signup"
+      },
+      {
+        "displayValue": "Subscribe",
+        "value": "subscribe"
       },
       {
         "displayValue": "View Category",
         "value": "viewcategory"
       },
       {
-        "displayValue": "Custom",
-        "value": "custom"
+        "displayValue": "View Content",
+        "value": "viewcontent"
+      },
+      {
+        "displayValue": "Watch Video",
+        "value": "watchvideo"
+      },
+      {
+        "displayValue": "Custom Event",
+        "value": "ADE"
       }
     ],
     "displayName": "Event to Fire",
     "name": "eventName",
     "type": "SELECT"
+  },
+  {
+    "help": "This allows you to define your own custom event name.",
+    "displayName": "Event name:",
+    "name": "adeEventName",
+    "type": "TEXT",
+    "enablingConditions": [
+      {
+        "paramName": "eventName",
+        "type": "EQUALS",
+        "paramValue": "ADE"
+      }
+    ],
+    "valueValidators": [
+      {
+        "type": "NON_EMPTY"
+      },
+      {
+        "args": [
+          "^[a-zA-Z_]+$"
+        ],
+        "type": "REGEX"
+      }
+    ],
   },
   {
     "help": "Enter optional order information here. Setting these values is highly recommended to improve conversions and reporting.",
@@ -347,6 +395,7 @@ const createArgumentsQueue = require('createArgumentsQueue');
 const injectScript = require('injectScript');
 const log = require('logToConsole');
 const makeTableMap = require('makeTableMap');
+const JSON = require('JSON');
 
 /**
  * This GTM snippet takes care of loading the Pinterest tag and firing events.
@@ -491,10 +540,17 @@ const onSuccess = function() {
   }
 
   if (data.eventName !== '') {
-    log('Firing Pinterest event: ' + data.eventName);
-    log('Event Data:');
-    log(eventData);
-    pintrk('track', data.eventName, eventData);
+    let finalEventName = data.eventName;
+
+    // ADE events
+    if (finalEventName === 'ADE') {
+      log('ADE name: ' + data.adeEventName);
+      finalEventName = data.adeEventName;
+    }
+
+    log('Firing Pinterest event: ' + finalEventName);
+    log('Event Data:' + JSON.stringify(eventData));
+    pintrk('track', finalEventName, eventData);
   }
   data.gtmOnSuccess();
 };
@@ -673,9 +729,10 @@ ___NOTES___
 
 Points of Contact:
 
+Lijun Yan <lyan@pinterest.com>
 Yuchen Mou <ymou@pinterest.com>
 Jian Li <jianli@pinterest.com>
-Mirko Rodriguez Mallma <mrodriguezmallma@pinterest.com>
+Mirko J. Rodriguez Mallma <mrodriguezmallma@pinterest.com>
 
 Created on 2/19/2019, 9:22:34 PM
-Updated on 07/19/2023, 3:40:00 PM
+Updated on 7/28/2025, 12:00:00 PM
