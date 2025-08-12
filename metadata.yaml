@@ -2,7 +2,7 @@ homepage: "https://help.pinterest.com/en/business/article/google-tag-manager-and
 documentation: "https://help.pinterest.com/en/business/article/google-tag-manager-and-pinterest-tag"
 versions:
   # Latest version
-- sha: 5538f7f027d0bb481ea88a0c40b4ef41b73330fa
+- sha: eb083ef79c3356d609c9bc63441231f4860bc985
   changeNotes: Add support for new event types and Advertiser Defined Events (ADE).
   # Older versions
 - sha: 50b2dae74cbe17db80beddf35c1082dc24e95310
