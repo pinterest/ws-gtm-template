@@ -14,7 +14,7 @@ ___INFO___
   "securityGroups": [
     "NON_GOOGLE_SCRIPTS"
   ],
-  "displayName": "Pinterest Tag",
+  "displayName": "Pinterest Pixel Tag",
     "categories": [
       "CONVERSIONS",
       "TAG_MANAGEMENT"
@@ -735,4 +735,4 @@ Jian Li <jianli@pinterest.com>
 Mirko J. Rodriguez Mallma <mrodriguezmallma@pinterest.com>
 
 Created on 2/19/2019, 9:22:34 PM
-Updated on 7/28/2025, 12:00:00 PM
+Updated on 9/15/2025, 12:00:00 PM
