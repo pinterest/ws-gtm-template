@@ -287,6 +287,11 @@ ___TEMPLATE_PARAMETERS___
     "type": "TEXT"
   },
   {
+    "type": "LABEL",
+    "name": "lbl_line",
+    "displayName": "\u003cb\u003eAdditional Parameters\u003c/b\u003e"
+  },
+  {
     "enablingConditions": [
       {
         "paramName": "eventName",
@@ -331,6 +336,64 @@ ___TEMPLATE_PARAMETERS___
             "type": "SIMPLE_TABLE"
           }
         ]
+      }
+    ]
+  },
+  {
+    "type": "CHECKBOX",
+    "name": "setPdParams",
+    "checkboxText": "Partner Data Parameters",
+    "simpleValueType": true,
+    "help": "If checked, you could add 'pd' parameters within the request.",
+    "enablingConditions": [
+      {
+        "paramName": "eventName",
+        "type": "NOT_EQUALS",
+        "paramValue": ""
+      }
+    ],
+    "subParams": [
+      {
+        "enablingConditions": [
+          {
+            "paramName": "setPdParams",
+            "type": "EQUALS",
+            "paramValue": true
+          }
+        ],
+        "displayName": "",
+        "name": "pdParameters",
+        "simpleTableColumns": [
+          {
+            "valueValidators": [
+              {
+                "type": "NON_EMPTY"
+              }
+            ],
+            "defaultValue": "external_id",
+            "displayName": "Name",
+            "name": "name",
+            "isUnique": true,
+            "type": "SELECT",
+            "selectItems": [
+              {
+                "value": "external_id",
+                "displayValue": "External Id"
+              },
+              {
+                "value": "maid",
+                "displayValue": "Maid"
+              }
+            ]
+          },
+          {
+            "defaultValue": "",
+            "displayName": "Value",
+            "name": "value",
+            "type": "TEXT"
+          }
+        ],
+        "type": "SIMPLE_TABLE"
       }
     ]
   },
@@ -420,12 +483,15 @@ if (isFirstLoad) {
   // it will process existing items in the queue on load.
   const initializationData = {
     'np': 'gtm',
+    'gtm_version': 'gallery' // To identify the gtm version: legacy vs gallery
   };
   if (data.em) {
     initializationData.em = data.em;
   }
   // Set opt_out params
   setOptOutParams(data, initializationData);
+  // Copy pd parameters, if any, into initializationData.
+  overridePartnerData(data, initializationData);
   pintrk('load', data.tagId.toString(), initializationData);
   pintrk('page');
 } else {
@@ -435,6 +501,10 @@ if (isFirstLoad) {
   }
   // Override opt_out params
   overrideOptOutParams(data, partnerDataUpdate);
+
+  // Copy pd parameters, if any, into partnerDataUpdate.
+  overridePartnerData(data, partnerDataUpdate);
+
   pintrk('set', partnerDataUpdate);
 }
 
@@ -444,6 +514,7 @@ if (isFirstLoad) {
 if (data.eventName === "") {
   const partnerDataUpdate = {};
   setOptOutParams(data, partnerDataUpdate);
+  overridePartnerData(data, partnerDataUpdate);
   pintrk('set', partnerDataUpdate);
 }
 
@@ -475,6 +546,17 @@ function overrideOptOutParams(data, pdObject) {
   }
 }
 
+// Override 'pd'
+function overridePartnerData(data, pdObject) {
+  if (data.setPdParams) {
+    data.pdParameters.forEach(d => {
+      if (d.value) {
+        pdObject[d.name] = d.value;
+      }
+    });
+  }
+}
+
 /**
  * Define function to setup event data and call pintrk() as needed.
  * Intentionally verbose for completeness.
@@ -484,6 +566,7 @@ const onSuccess = function() {
   let eventData = {};
 
   // Copy custom parameters, if any, into eventData.
+  // This copies the params only from the table 'customParameters' to eventData
   // We do this first so that in case someone has defined
   // a custom parameter with the same name as a top-level
   // field, then the top-level field will take precedence.
@@ -494,6 +577,7 @@ const onSuccess = function() {
   // In the extremely unlikely event that someone has created a 'np'
   // custom field, we make sure to override that.
   eventData.np = 'gtm';
+  eventData.gtm_version = 'gallery';
 
   const safeCopyField = (fieldName) => {
     if (data[fieldName] !== undefined) {
@@ -735,4 +819,4 @@ Jian Li <jianli@pinterest.com>
 Mirko J. Rodriguez Mallma <mrodriguezmallma@pinterest.com>
 
 Created on 2/19/2019, 9:22:34 PM
-Updated on 9/15/2025, 12:00:00 PM
+Updated on 9/22/2025, 12:00:00 PM
