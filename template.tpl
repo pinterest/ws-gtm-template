@@ -62,6 +62,14 @@ ___TEMPLATE_PARAMETERS___
     "valueHint": "{{email}}"
   },
   {
+    "notSetText": "Not set (recommended for Enhanced Match)",
+    "help": "Optional, but recommended at least on checkout event. This is the sha256 hashes of user's phone numbers, only digits with country code, area code, and number.",
+    "displayName": "Hashed Phone",
+    "name": "ph",
+    "type": "TEXT",
+    "valueHint": "{{phone}}"
+  },
+  {
     "macrosInSelect": false,
     "selectItems": [
       {
@@ -488,6 +496,9 @@ if (isFirstLoad) {
   if (data.em) {
     initializationData.em = data.em;
   }
+  if (data.ph) {
+    initializationData.ph = data.ph;
+  }
   // Set opt_out params
   setOptOutParams(data, initializationData);
   // Copy pd parameters, if any, into initializationData.
@@ -498,6 +509,9 @@ if (isFirstLoad) {
   const partnerDataUpdate = {};
   if (data.em) {
     partnerDataUpdate.em = data.em;
+  }
+  if (data.ph) {
+    partnerDataUpdate.ph = data.ph;
   }
   // Override opt_out params
   overrideOptOutParams(data, partnerDataUpdate);
