@@ -85,8 +85,20 @@ ___TEMPLATE_PARAMETERS___
         "value": "checkout"
       },
       {
+        "displayValue": "Contact",
+        "value": "contact"
+      },
+      {
         "displayValue": "Custom (legacy)",
         "value": "custom"
+      },
+      {
+        "displayValue": "Customize Product",
+        "value": "customizeproduct"
+      },
+      {
+        "displayValue": "Find Location",
+        "value": "findlocation"
       },
       {
         "displayValue": "Initiate Checkout",
@@ -102,12 +114,24 @@ ___TEMPLATE_PARAMETERS___
         "value": "pagevisit"
       },
       {
+        "displayValue": "Schedule",
+        "value": "schedule"
+      },
+      {
         "displayValue": "Search",
         "value": "search"
       },
       {
         "displayValue": "Signup",
         "value": "signup"
+      },
+      {
+        "displayValue": "Start Trial",
+        "value": "starttrial"
+      },
+      {
+        "displayValue": "Submit Application",
+        "value": "submitapplication"
       },
       {
         "displayValue": "Subscribe",
@@ -817,6 +841,7 @@ Lijun Yan <lyan@pinterest.com>
 Yuchen Mou <ymou@pinterest.com>
 Jian Li <jianli@pinterest.com>
 Mirko J. Rodriguez Mallma <mrodriguezmallma@pinterest.com>
+John Abdou <jabdou@pinterest.com>
 
 Created on 2/19/2019, 9:22:34 PM
-Updated on 9/22/2025, 12:00:00 PM
+Updated on 3/4/2026, 12:00:00 PM
