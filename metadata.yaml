@@ -2,9 +2,11 @@ homepage: "https://help.pinterest.com/en/business/article/google-tag-manager-and
 documentation: "https://help.pinterest.com/en/business/article/google-tag-manager-and-pinterest-tag"
 versions:
   # Latest version
+- sha: 3badb27cff68a322d97aa9d3a121818fdf596e0e
+  changeNotes: Add 6 new standard events
+  # Older versions
 - sha: 7dd52c38e842302ad94251a694a9d35323611cbb
   changeNotes: Add support for 'external_id' and 'maid' parameters.
-  # Older versions
 - sha: f4e76095ecbc6e8d8cfe26c9174259bd192bcdc1
   changeNotes: First version of the Pinterest Pixel Tag - Official.
 - sha: eb083ef79c3356d609c9bc63441231f4860bc985
