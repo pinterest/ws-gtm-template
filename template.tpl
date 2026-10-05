@@ -10,7 +10,7 @@ ___INFO___
 {
   "type": "TAG",
   "id": "pntr",
-  "version": 1.4,
+  "version": 1.5,
   "securityGroups": [
     "NON_GOOGLE_SCRIPTS"
   ],
@@ -54,12 +54,119 @@ ___TEMPLATE_PARAMETERS___
     "valueHint": "Pinterest Tag ID"
   },
   {
+    "help": "Unique identifier for this event, used for deduplication across browser and Conversions API events. A Custom Parameter that sets the event ID (accepted names: 'event_id', 'eventID', 'eid') takes precedence over this field.",
+    "enablingConditions": [
+      {
+        "paramName": "eventName",
+        "type": "NOT_EQUALS",
+        "paramValue": ""
+      }
+    ],
+    "displayName": "External Event ID",
+    "name": "event_id",
+    "type": "TEXT"
+  },
+  {
     "notSetText": "Not set (required for Enhanced Match)",
     "help": "Optional, but required for Enhanced Match. This is the user\u0027s email address, stripped of whitespace, lower-cased, then hashed with MD5, SHA1, or SHA-256. As a fallback, a raw email address can also be used. In this case, we will hash the email address for you, in the browser. (The email address *never* leaves the browser, and Pinterest never sees it.) See https://help.pinterest.com/en/business/article/enhanced-match for more information.",
     "displayName": "Hashed Email",
     "name": "em",
     "type": "TEXT",
     "valueHint": "{{email}}"
+  },
+  {
+    "simpleValueType": true,
+    "name": "advancedMatching",
+    "checkboxText": "Enable Enhanced Match",
+    "type": "CHECKBOX",
+    "help": "Enhanced Match can improve conversion attribution by sending customer information with the Pinterest tag. Raw or pre-hashed values are accepted; plaintext PII is hashed in the browser before leaving the page. See https://help.pinterest.com/en/business/article/enhanced-match for more information."
+  },
+  {
+    "enablingConditions": [
+      {
+        "paramName": "advancedMatching",
+        "type": "EQUALS",
+        "paramValue": true
+      }
+    ],
+    "displayName": "Customer Information Data Parameters",
+    "name": "advancedMatchingGroup",
+    "groupStyle": "ZIPPY_CLOSED",
+    "type": "GROUP",
+    "subParams": [
+      {
+        "displayName": "",
+        "name": "advancedMatchingList",
+        "simpleTableColumns": [
+          {
+            "selectItems": [
+              {
+                "displayValue": "City",
+                "value": "ct"
+              },
+              {
+                "displayValue": "Country",
+                "value": "country"
+              },
+              {
+                "displayValue": "Date of Birth",
+                "value": "db"
+              },
+              {
+                "displayValue": "External ID",
+                "value": "external_id"
+              },
+              {
+                "displayValue": "First Name",
+                "value": "fn"
+              },
+              {
+                "displayValue": "Gender",
+                "value": "ge"
+              },
+              {
+                "displayValue": "Last Name",
+                "value": "ln"
+              },
+              {
+                "displayValue": "Maid",
+                "value": "maid"
+              },
+              {
+                "displayValue": "Phone",
+                "value": "ph"
+              },
+              {
+                "displayValue": "State",
+                "value": "st"
+              },
+              {
+                "displayValue": "Zip Code",
+                "value": "zp"
+              }
+            ],
+            "defaultValue": "",
+            "displayName": "Parameter name",
+            "name": "name",
+            "isUnique": true,
+            "type": "SELECT"
+          },
+          {
+            "defaultValue": "",
+            "displayName": "Parameter value",
+            "name": "value",
+            "type": "TEXT"
+          }
+        ],
+        "type": "SIMPLE_TABLE",
+        "newRowButtonText": "Add parameter",
+        "valueValidators": [
+          {
+            "type": "NON_EMPTY"
+          }
+        ]
+      }
+    ]
   },
   {
     "macrosInSelect": false,
@@ -188,12 +295,32 @@ ___TEMPLATE_PARAMETERS___
       {
         "paramName": "eventName",
         "type": "EQUALS",
+        "paramValue": "addtocart"
+      },
+      {
+        "paramName": "eventName",
+        "type": "EQUALS",
         "paramValue": "checkout"
       },
       {
         "paramName": "eventName",
         "type": "EQUALS",
-        "paramValue": "addtocart"
+        "paramValue": "addpaymentinfo"
+      },
+      {
+        "paramName": "eventName",
+        "type": "EQUALS",
+        "paramValue": "addtowishlist"
+      },
+      {
+        "paramName": "eventName",
+        "type": "EQUALS",
+        "paramValue": "initiatecheckout"
+      },
+      {
+        "paramName": "eventName",
+        "type": "EQUALS",
+        "paramValue": "customizeproduct"
       }
     ],
     "displayName": "Cart Parameters",
@@ -258,6 +385,31 @@ ___TEMPLATE_PARAMETERS___
         "paramName": "eventName",
         "type": "EQUALS",
         "paramValue": "checkout"
+      },
+      {
+        "paramName": "eventName",
+        "type": "EQUALS",
+        "paramValue": "viewcontent"
+      },
+      {
+        "paramName": "eventName",
+        "type": "EQUALS",
+        "paramValue": "addpaymentinfo"
+      },
+      {
+        "paramName": "eventName",
+        "type": "EQUALS",
+        "paramValue": "addtowishlist"
+      },
+      {
+        "paramName": "eventName",
+        "type": "EQUALS",
+        "paramValue": "initiatecheckout"
+      },
+      {
+        "paramName": "eventName",
+        "type": "EQUALS",
+        "paramValue": "customizeproduct"
       }
     ],
     "displayName": "Line Items",
@@ -266,15 +418,57 @@ ___TEMPLATE_PARAMETERS___
     "type": "GROUP",
     "subParams": [
       {
+        "displayName": "Line Items (Array Variable)",
+        "name": "lineItemsVariable",
+        "simpleValueType": true,
+        "help": "Optional. A variable that resolves to an array of line item objects (or a JSON string that parses to one), each with product_id, product_category, product_name, product_brand, product_price, and/or product_quantity. When set, this takes precedence over the single-product fields below.",
+        "type": "TEXT"
+      },
+      {
         "displayName": "Product ID",
         "simpleValueType": true,
         "name": "product_id",
+        "help": "Not required if the Line Items (Array Variable) above is provided; this field is only used as a single-item fallback.",
         "type": "TEXT"
       },
       {
         "displayName": "Product Category",
         "simpleValueType": true,
         "name": "product_category",
+        "help": "Not required if the Line Items (Array Variable) above is provided; this field is only used as a single-item fallback.",
+        "type": "TEXT"
+      },
+      {
+        "displayName": "Product Title",
+        "simpleValueType": true,
+        "name": "product_name",
+        "help": "Not required if the Line Items (Array Variable) above is provided; this field is only used as a single-item fallback.",
+        "type": "TEXT"
+      },
+      {
+        "displayName": "Product Brand",
+        "simpleValueType": true,
+        "name": "product_brand",
+        "help": "Not required if the Line Items (Array Variable) above is provided; this field is only used as a single-item fallback.",
+        "type": "TEXT"
+      },
+      {
+        "displayName": "Product Price",
+        "simpleValueType": true,
+        "name": "product_price",
+        "help": "Not required if the Line Items (Array Variable) above is provided; this field is only used as a single-item fallback.",
+        "type": "TEXT"
+      },
+      {
+        "valueValidators": [
+          {
+            "type": "NUMBER"
+          }
+        ],
+        "displayName": "Product Quantity",
+        "simpleValueType": true,
+        "name": "product_quantity",
+        "help": "Not required if the Line Items (Array Variable) above is provided; this field is only used as a single-item fallback.",
         "type": "TEXT"
       }
     ]
@@ -314,6 +508,20 @@ ___TEMPLATE_PARAMETERS___
     "type": "LABEL",
     "name": "lbl_line",
     "displayName": "\u003cb\u003eAdditional Parameters\u003c/b\u003e"
+  },
+  {
+    "type": "CHECKBOX",
+    "name": "useGA4Ecommerce",
+    "checkboxText": "Read data from GA4 dataLayer",
+    "simpleValueType": true,
+    "help": "If checked, user data and ecommerce data are read from the GA4 \u0027eventModel\u0027 and \u0027ecommerce\u0027 dataLayer objects. Multiple products are supported this way. Fields set manually in this tag always take precedence over dataLayer values.",
+    "enablingConditions": [
+      {
+        "paramName": "eventName",
+        "type": "NOT_EQUALS",
+        "paramValue": ""
+      }
+    ]
   },
   {
     "enablingConditions": [
@@ -368,7 +576,7 @@ ___TEMPLATE_PARAMETERS___
     "name": "setPdParams",
     "checkboxText": "Partner Data Parameters",
     "simpleValueType": true,
-    "help": "If checked, you could add 'pd' parameters within the request.",
+    "help": "If checked, you could add 'pd' parameters within the request. Values also set under Enhanced Match (e.g. External ID, Maid) take precedence over the same parameter set here.",
     "enablingConditions": [
       {
         "paramName": "eventName",
@@ -426,7 +634,7 @@ ___TEMPLATE_PARAMETERS___
     "name": "setOptOut",
     "checkboxText": "Opt Out Information",
     "simpleValueType": true,
-    "help": "If checked, you could set the Opt Out Information for Privacy regulations such as CCPA."
+    "help": "If checked, you could set the Opt Out Information for Privacy regulations such as CCPA, including State and Country for LDP. State and Country set here take precedence over the values set under Enhanced Match."
   },
   {
     "help": "'opt_out_type' is the field where we accept opt outs for your users' privacy preference. \u003cbr\u003e\u003cbr\u003e It can handle multiple values with commas separated. Current accepted value is \u003cb\u003eLDP\u003c/b\u003e for Limited Data Processing.",
@@ -442,7 +650,7 @@ ___TEMPLATE_PARAMETERS___
     ]
   },
   {
-    "help": "'st' is the field for sharing a user's \u003cb\u003estate of residency\u003c/b\u003e in connection with use of the LDP flag. Please note that the LDP flag does not currently have any effect for users outside of the State of California. \u003cbr\u003e\u003cbr\u003e The state names we accept are SHA256 hashed, standard USPS state abbreviations with two characters (e.g., 'CA').",
+    "help": "'st' is the field for sharing a user's \u003cb\u003estate of residency\u003c/b\u003e in connection with use of the LDP flag. Please note that the LDP flag does not currently have any effect for users outside of the State of California. \u003cbr\u003e\u003cbr\u003e The state names we accept are SHA256 hashed, standard USPS state abbreviations with two characters (e.g., 'CA'). This takes precedence over the State set under Enhanced Match.",
     "displayName": "State",
     "name": "st",
     "type": "TEXT",
@@ -455,7 +663,7 @@ ___TEMPLATE_PARAMETERS___
     ]
   },
   {
-    "help": "'country' is the field in which you pass a user’s country of residency in connection with use of the LDP flag. Please note that the LDP flag does not currently have any effect for users outside of the State of California. \u003cbr\u003e\u003cbr\u003e The country names we accept are SHA256 hashed, standard ISO-3166 country codes with two characters (e.g., 'US', 'DE').",
+    "help": "'country' is the field in which you pass a user’s country of residency in connection with use of the LDP flag. Please note that the LDP flag does not currently have any effect for users outside of the State of California. \u003cbr\u003e\u003cbr\u003e The country names we accept are SHA256 hashed, standard ISO-3166 country codes with two characters (e.g., 'US', 'DE'). This takes precedence over the Country set under Enhanced Match.",
     "displayName": "Country",
     "name": "country",
     "type": "TEXT",
@@ -477,12 +685,15 @@ ___TEMPLATE_PARAMETERS___
 
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
+const copyFromDataLayer = require('copyFromDataLayer');
 const copyFromWindow = require('copyFromWindow');
 const createArgumentsQueue = require('createArgumentsQueue');
 const injectScript = require('injectScript');
 const log = require('logToConsole');
+const makeNumber = require('makeNumber');
 const makeTableMap = require('makeTableMap');
 const JSON = require('JSON');
+const getType = require('getType');
 
 /**
  * This GTM snippet takes care of loading the Pinterest tag and firing events.
@@ -491,13 +702,140 @@ const JSON = require('JSON');
  * once so you can load and call this multiple times without worrying multiple
  * loads, etc.
  */
-log('GTM PTag v1.4; tagId: ' + data.tagId);
+log('GTM PTag v1.5; tagId: ' + data.tagId);
 
 // Check to see if we've already created the queue.
 const isFirstLoad = !copyFromWindow('pintrk');
 
 // Set up window.pintrk. Won't re-create if it already exists.
 const pintrk = createArgumentsQueue('pintrk', 'pintrk.queue');
+
+/**
+ * Copy a template field onto a pd object when it is set.
+ */
+function copyPartnerDataField(data, pdObject, fieldName) {
+  if (data[fieldName] !== undefined && data[fieldName] !== '') {
+    pdObject[fieldName] = data[fieldName];
+  }
+}
+
+/**
+ * Copy a source field onto a target object only when the target key is still
+ * blank, so manually configured fields keep precedence over the dataLayer.
+ * Optionally maps to a different target key (e.g. region -> st).
+ */
+function fillField(source, target, fieldName, targetKey) {
+  const key = targetKey || fieldName;
+  if ((target[key] === undefined || target[key] === '') &&
+      source[fieldName] !== undefined && source[fieldName] !== '') {
+    target[key] = source[fieldName];
+  }
+}
+
+/**
+ * Copy Enhanced Match / user data onto partner data.
+ * The base-form Email field and the Enhanced Match table (Customer Information
+ * Data Parameters) both feed partner data. Opt Out Information st/country are
+ * applied after this function in every flow, so they win on collision.
+ */
+function copyUserDataFields(data, pdObject) {
+  // Enhanced Match table: one row per user-data parameter (ph, ct, st, ...).
+  if (data.advancedMatching && data.advancedMatchingList) {
+    data.advancedMatchingList.forEach(row => {
+      if (row.name && row.value) {
+        pdObject[row.name] = row.value;
+      }
+    });
+  }
+  // Base-form Email is applied here to feed partner data.
+  copyPartnerDataField(data, pdObject, 'em');
+  fillUserDataFromDataLayer(data, pdObject);
+}
+
+/**
+ * Read the GA4 'eventModel' dataLayer object, which is where GA4 places
+ * user-provided data. 'ecommerce' never carries it.
+ */
+function getDataLayerEventModel() {
+  const eventModel = copyFromDataLayer('eventModel', 1);
+  return getType(eventModel) === 'object' ? eventModel : {};
+}
+
+/**
+ * Fill partner-data keys the advertiser left blank with GA4 user-provided data.
+ * Manual template fields always win, so nothing already set is overwritten.
+ */
+function fillUserDataFromDataLayer(data, pdObject) {
+  if (!data.useGA4Ecommerce) {
+    return;
+  }
+  const userData = getDataLayerEventModel().user_data;
+  if (getType(userData) !== 'object') {
+    return;
+  }
+  fillField(userData, pdObject, 'email_address', 'em');
+  fillField(userData, pdObject, 'phone_number', 'ph');
+
+  const address = getType(userData.address) === 'object' ? userData.address : {};
+  fillField(address, pdObject, 'first_name', 'fn');
+  fillField(address, pdObject, 'last_name', 'ln');
+  fillField(address, pdObject, 'city', 'ct');
+  fillField(address, pdObject, 'region', 'st');
+  fillField(address, pdObject, 'postal_code', 'zp');
+  fillField(address, pdObject, 'country', 'country');
+}
+
+/**
+ * Read GA4 commerce data into event data. 'ecommerce' is preferred when
+ * present; otherwise the event parameters themselves carry the fields.
+ * Scalar values (currency/value/order_id/search_query/order_quantity) only
+ * fill keys that are still blank. The line items array is NOT assigned here;
+ * it is returned so the caller can resolve it against the other line-item
+ * sources by precedence. Returns undefined when there is no usable array.
+ */
+function copyCommerceDataFromDataLayer(data, eventData) {
+  if (!data.useGA4Ecommerce) {
+    return undefined;
+  }
+  const ecommerce = copyFromDataLayer('ecommerce', 1);
+  const commerce =
+    getType(ecommerce) === 'object' ? ecommerce : getDataLayerEventModel();
+
+  fillField(commerce, eventData, 'currency');
+  fillField(commerce, eventData, 'value');
+  fillField(commerce, eventData, 'transaction_id', 'order_id');
+  fillField(commerce, eventData, 'search_term', 'search_query');
+
+  const items = commerce.items;
+  if (getType(items) !== 'array' || items.length === 0) {
+    return undefined;
+  }
+
+  const lineItems = [];
+  let totalQuantity = 0;
+  items.forEach(item => {
+    if (getType(item) !== 'object') {
+      return;
+    }
+    const lineItem = {};
+    fillField(item, lineItem, 'item_id', 'product_id');
+    fillField(item, lineItem, 'item_name', 'product_name');
+    fillField(item, lineItem, 'item_category', 'product_category');
+    fillField(item, lineItem, 'item_brand', 'product_brand');
+    fillField(item, lineItem, 'price', 'product_price');
+    fillField(item, lineItem, 'quantity', 'product_quantity');
+    lineItems.push(lineItem);
+    // GA4 omits quantity for single-unit items.
+    const quantity =
+      item.quantity === undefined ? 1 : makeNumber(item.quantity);
+    totalQuantity = totalQuantity + (quantity ? quantity : 0);
+  });
+
+  if (totalQuantity > 0 && eventData.order_quantity === undefined) {
+    eventData.order_quantity = totalQuantity;
+  }
+  return lineItems.length > 0 ? lineItems : undefined;
+}
 
 /**
  * First-time Load/Initialization.
@@ -509,25 +847,20 @@ if (isFirstLoad) {
     'np': 'gtm',
     'gtm_version': 'gallery' // To identify the gtm version: legacy vs gallery
   };
-  if (data.em) {
-    initializationData.em = data.em;
-  }
+  // Copy pd parameters first so first-class user data can override.
+  overridePartnerData(data, initializationData);
+  copyUserDataFields(data, initializationData);
   // Set opt_out params
   setOptOutParams(data, initializationData);
-  // Copy pd parameters, if any, into initializationData.
-  overridePartnerData(data, initializationData);
   pintrk('load', data.tagId.toString(), initializationData);
   pintrk('page');
 } else {
   const partnerDataUpdate = {};
-  if (data.em) {
-    partnerDataUpdate.em = data.em;
-  }
+  // Copy pd parameters first so first-class user data can override.
+  overridePartnerData(data, partnerDataUpdate);
+  copyUserDataFields(data, partnerDataUpdate);
   // Override opt_out params
   overrideOptOutParams(data, partnerDataUpdate);
-
-  // Copy pd parameters, if any, into partnerDataUpdate.
-  overridePartnerData(data, partnerDataUpdate);
 
   pintrk('set', partnerDataUpdate);
 }
@@ -537,12 +870,14 @@ if (isFirstLoad) {
 // but not include config values
 if (data.eventName === "") {
   const partnerDataUpdate = {};
-  setOptOutParams(data, partnerDataUpdate);
   overridePartnerData(data, partnerDataUpdate);
+  copyUserDataFields(data, partnerDataUpdate);
+  setOptOutParams(data, partnerDataUpdate);
   pintrk('set', partnerDataUpdate);
 }
 
-// Set opt_out params
+// Set opt_out params. Called after copyUserDataFields so opt-out st/country
+// take precedence over the User Data values on collision.
 function setOptOutParams(data, pdObject) {
   if (data.setOptOut) {
     if (data.opt_out_type) {
@@ -557,22 +892,29 @@ function setOptOutParams(data, pdObject) {
   }
 }
 
-// Override opt_out params
+// Override opt_out params. Opt-out st/country take precedence over User Data;
+// when unset the User Data values already on pdObject are left intact.
 function overrideOptOutParams(data, pdObject) {
   if (data.setOptOut) {
     pdObject.opt_out_type = data.opt_out_type ? data.opt_out_type : undefined;
-    pdObject.st = data.st ? data.st : undefined;
-    pdObject.country = data.country ? data.country : undefined;
+    if (data.st) {
+      pdObject.st = data.st;
+    }
+    if (data.country) {
+      pdObject.country = data.country;
+    }
   } else {
     pdObject.opt_out_type = undefined;
-    pdObject.st = undefined;
-    pdObject.country = undefined;
   }
 }
 
-// Override 'pd'
+// Override 'pd' from Partner Data Parameters table. copyUserDataFields runs
+// after this in every flow, so Enhanced Match values (e.g. external_id) win
+// over duplicate keys set here.
 function overridePartnerData(data, pdObject) {
-  if (data.setPdParams) {
+  // data.pdParameters is undefined when the checkbox is set but the table is
+  // empty, so guard against calling forEach on undefined.
+  if (data.setPdParams && data.pdParameters) {
     data.pdParameters.forEach(d => {
       if (d.value) {
         pdObject[d.name] = d.value;
@@ -594,8 +936,12 @@ const onSuccess = function() {
   // We do this first so that in case someone has defined
   // a custom parameter with the same name as a top-level
   // field, then the top-level field will take precedence.
+  // Exception: 'event_id' is handled below so that a custom parameter
+  // named 'event_id' takes precedence over the top-level field.
   if (data.setCustomParams) {
-    eventData = makeTableMap(data.values, 'name', 'value');
+    // makeTableMap returns null for an empty table, so fall back to {} to
+    // avoid dereferencing null when the checkbox is set but no rows are added.
+    eventData = makeTableMap(data.values, 'name', 'value') || {};
   }
 
   // In the extremely unlikely event that someone has created a 'np'
@@ -603,13 +949,38 @@ const onSuccess = function() {
   eventData.np = 'gtm';
   eventData.gtm_version = 'gallery';
 
+  // When a variable resolving to a non-empty array of line items is provided,
+  // it takes precedence over the single-product fields below. The value may be
+  // an array directly, or a JSON string that parses to an array. JSON.parse
+  // returns undefined on malformed input, so bad strings fall through safely.
+  let lineItemsFromVar;
+  if (data.lineItemsVariable !== undefined) {
+    let parsedLineItems = data.lineItemsVariable;
+    if (getType(parsedLineItems) === 'string') {
+      parsedLineItems = JSON.parse(parsedLineItems);
+    }
+    if (getType(parsedLineItems) === 'array' && parsedLineItems.length > 0) {
+      lineItemsFromVar = parsedLineItems;
+    }
+  }
+
   const safeCopyField = (fieldName) => {
     if (data[fieldName] !== undefined) {
       eventData[fieldName] = data[fieldName];
     }
   };
 
+  // Read GA4 dataLayer commerce data. Scalar fields (currency, value, order_id,
+  // search_query, order_quantity) are filled into eventData now so the manual
+  // fields in the switch below can still overwrite them; the line items array is
+  // returned and resolved by precedence after the switch.
+  const lineItemsFromDataLayer = copyCommerceDataFromDataLayer(data, eventData);
+
   const safeCopyLineItem = (fieldName) => {
+    // Manual single-product fields are the lowest-precedence line-item source:
+    // they only apply when neither the Line Items variable nor the GA4
+    // dataLayer supplied an array.
+    if (lineItemsFromVar || lineItemsFromDataLayer) return;
     if (data[fieldName] !== undefined) {
       if (eventData.line_items === undefined) {
         eventData.line_items = [{}];
@@ -617,6 +988,17 @@ const onSuccess = function() {
       eventData.line_items[0][fieldName] = data[fieldName];
     }
   };
+
+  // External event ID applies to any tracked event.
+  // A Custom Parameter that sets the event ID takes precedence over the
+  // top-level External Event ID field. Accepted event ID aliases are
+  // 'event_id', 'eventID' and 'eid', so only copy the top-level field when
+  // none of those were already set by a custom parameter.
+  if (eventData.event_id === undefined &&
+      eventData.eventID === undefined &&
+      eventData.eid === undefined) {
+    safeCopyField('event_id');
+  }
 
   switch (data.eventName) {
     case 'watchvideo':   // No fields defined.
@@ -630,21 +1012,40 @@ const onSuccess = function() {
     case 'search':
       safeCopyField('search_query');
       break;
-    case 'addtocart':    // AddToCart and Checkout share the same fields.
+    case 'addtocart':
     case 'checkout':
+    case 'addpaymentinfo':
+    case 'addtowishlist':
+    case 'initiatecheckout':
+    case 'customizeproduct':
       safeCopyField('order_id');
       safeCopyField('order_quantity');
       safeCopyField('value');
       safeCopyField('currency');
-      // Intentional fall-through, page vist has only ID and category.
+      // Intentional fall-through for line items.
     case 'pagevisit':
+    case 'viewcontent':
       safeCopyLineItem('product_id');
       safeCopyLineItem('product_category');
+      safeCopyLineItem('product_name');
+      safeCopyLineItem('product_brand');
+      safeCopyLineItem('product_price');
+      safeCopyLineItem('product_quantity');
       break;
     default:
       // Just fallthrough as server-side code will take care of
       // emitting an error message to the console.
       break;
+  }
+
+  // Resolve line items by strict precedence:
+  // Line Items variable > GA4 dataLayer items[] > manual single-product fields.
+  // Higher tiers replace the whole array (no per-item merging); the manual
+  // fallback is whatever safeCopyLineItem already built above.
+  if (lineItemsFromVar) {
+    eventData.line_items = lineItemsFromVar;
+  } else if (lineItemsFromDataLayer) {
+    eventData.line_items = lineItemsFromDataLayer;
   }
 
   if (data.eventName !== '') {
@@ -655,7 +1056,7 @@ const onSuccess = function() {
       log('ADE name: ' + data.adeEventName);
       finalEventName = data.adeEventName;
     }
-
+    
     log('Firing Pinterest event: ' + finalEventName);
     log('Event Data:' + JSON.stringify(eventData));
     pintrk('track', finalEventName, eventData);
@@ -824,6 +1225,44 @@ ___WEB_PERMISSIONS___
       "isEditedByUser": true
     },
     "isRequired": true
+  },
+  {
+    "instance": {
+      "key": {
+        "publicId": "read_data_layer",
+        "versionId": "1"
+      },
+      "param": [
+        {
+          "key": "keyPatterns",
+          "value": {
+            "type": 2,
+            "listItem": [
+              {
+                "type": 1,
+                "string": "ecommerce"
+              },
+              {
+                "type": 1,
+                "string": "ecommerce.*"
+              },
+              {
+                "type": 1,
+                "string": "eventModel"
+              },
+              {
+                "type": 1,
+                "string": "eventModel.*"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "clientAnnotations": {
+      "isEditedByUser": true
+    },
+    "isRequired": true
   }
 ]
 
@@ -844,4 +1283,4 @@ Mirko J. Rodriguez Mallma <mrodriguezmallma@pinterest.com>
 John Abdou <jabdou@pinterest.com>
 
 Created on 2/19/2019, 9:22:34 PM
-Updated on 3/4/2026, 12:00:00 PM
+Updated on 9/24/2026, 12:00:00 PM
